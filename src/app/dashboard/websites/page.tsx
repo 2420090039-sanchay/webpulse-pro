@@ -381,16 +381,14 @@ export default function WebsitesPage() {
 
       <Card className="overflow-hidden border-border/80 bg-card/80 shadow-lg shadow-black/5 dark:shadow-black/20">
         <div className="overflow-x-auto">
-          <Table>
+          <Table className="w-full table-fixed">
             <TableHeader>
               <TableRow className="border-border/60 bg-muted/30 hover:bg-muted/30">
                 <TableHead className="text-muted-foreground">Website</TableHead>
                 <TableHead className="text-muted-foreground">Uptime</TableHead>
                 <TableHead className="text-muted-foreground">Content</TableHead>
                 <TableHead className="text-muted-foreground">Keywords</TableHead>
-                <TableHead className="min-w-[140px] text-muted-foreground">
-                  AI summary
-                </TableHead>
+                <TableHead className="w-[320px]">AI summary</TableHead>
                 <TableHead className="text-muted-foreground">Last check</TableHead>
                 <TableHead className="text-right text-muted-foreground">Actions</TableHead>
               </TableRow>
@@ -494,16 +492,18 @@ export default function WebsitesPage() {
                           <p className="mt-1 text-xs text-muted-foreground">—</p>
                         )}
                       </TableCell>
-                      <TableCell className="max-w-[200px] align-top text-xs text-muted-foreground">
-                        {site.latestAiSummary ? (
-                          <span title={site.latestAiSummary}>
-                            {site.latestAiSummary.slice(0, 100)}
-                            {site.latestAiSummary.length > 100 ? "…" : ""}
-                          </span>
-                        ) : (
-                          "—"
-                        )}
-                      </TableCell>
+                        <TableCell className="w-[320px] align-top">
+  {site.latestAiSummary ? (
+    <p
+      className="text-xs text-muted-foreground break-words leading-relaxed line-clamp-2 overflow-hidden"
+      title={site.latestAiSummary}
+    >
+      {site.latestAiSummary}
+    </p>
+  ) : (
+    <span className="text-xs text-muted-foreground">—</span>
+  )}
+</TableCell>
                       <TableCell className="whitespace-nowrap align-top text-sm text-muted-foreground">
                         {site.lastChecked
                           ? formatDistanceToNow(new Date(site.lastChecked), {
