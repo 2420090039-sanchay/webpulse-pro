@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Website {
+  id          String      @id @default(uuid())
+  url         String
+  name        String
+  status      String      @default("Pending")
+  lastChecked DateTime?
+  lastChanged DateTime?
+  isActive    Boolean     @default(true)
+
+  keywordsJson String     @default("[]")
+
+  lastIsUp       Boolean  @default(true)
+  lastHttpStatus Int?
+  lastLatencyMs  Int?
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  snapshots   Snapshot[]
+  changeLogs  ChangeLog[]
+  uptimeProbes UptimeProbe[]
+}
+
+model UptimeProbe {
+  id          String   @id @default(uuid())
+  websiteId   String
+  timestamp   DateTime @default(now())
+  isUp        Boolean
+  httpStatus  Int?
+  latencyMs   Int?
+  error       String?
+
+  website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@index([websiteId, timestamp])
+}
+
+model Snapshot {
+  id                String      @id @default(uuid())
+  websiteId         String
+  contentHash       String
+  normalizedContent String
+  timestamp         DateTime    @default(now())
+
+  httpStatus     Int?
+  responseTimeMs Int?
+  isUp           Boolean      @default(true)
+  fetchError     String?
+  screenshotPath String?
+
+  website           Website     @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  changeLogsAsNew   ChangeLog[] @relation("SnapshotRef")
+  changeLogsAsOld   ChangeLog[] @relation("PreviousSnapshotRef")
+}
+
+model ChangeLog {
+  id                 String      @id @default(uuid())
+  websiteId          String
+  snapshotId         String
+  previousSnapshotId String?
+  diffResult         String
+  classification     String
+  timestamp          DateTime    @default(now())
+
+  aiSummary          String?
+  keywordSignalsJson String?
+
+  website            Website     @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  snapshot           Snapshot    @relation("SnapshotRef", fields: [snapshotId], references: [id], onDelete: Cascade)
+  previousSnapshot   Snapshot?   @relation("PreviousSnapshotRef", fields: [previousSnapshotId], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/check?secret=your_cron_secret",
+      "schedule": "0 * * * *"
+    }
+  ]
+}
